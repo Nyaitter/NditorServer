@@ -67,7 +67,7 @@ const CloudProjectModal = ({isOpen, onClose, vm, initialTab = 'list'}) => {
         const next = result.project;
         setProject(next);
         setName(next.name || '');
-        setAccessMode(next.access_mode || 'invite');
+        setAccessMode(next.access_mode || 'private');
         setAllowAnonymous(next.allow_anonymous === true);
         if (next.is_owner) setAccess(await getAccessManagement(id));
         else setAccess(null);

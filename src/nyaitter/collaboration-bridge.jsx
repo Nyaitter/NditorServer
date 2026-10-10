@@ -1263,6 +1263,7 @@ const CollaborationBridge = ({vm: propVm}) => {
                     setModal({type: 'invite', url: invitationUrl(clientRef.current.token)});
                 }
             } else {
+                await refreshAuthSession();
                 setModal({type: 'host'});
             }
         };
@@ -2314,14 +2315,13 @@ const CollaborationBridge = ({vm: propVm}) => {
                     label: '権限',
                     type: 'select',
                     value: 'private',
-                    disabled: !getAuthSession()?.user,
+                    disabled: !authReady,
                     options: [
-                        {value: 'private',
-                    disabled: !getAuthSession()?.user, label: 'Invite — 招待または承認したユーザーのみ'},
+                        {value: 'invite', label: 'Invite — 招待または承認したユーザーのみ'},
                         {value: 'private', label: 'Private — URLを知っているユーザー'}
                     ]
                 },
-                {name: 'allowAnonymous', label: 'ゲストユーザーの参加を許可', type: 'checkbox', value: true, required: false, disabled: !getAuthSession()?.user},
+                {name: 'allowAnonymous', label: 'ゲストユーザーの参加を許可', type: 'checkbox', value: true, required: false, disabled: !authReady},
                 {
                     name: 'invitedUsers',
                     label: '招待するNyaitterID（カンマ区切り）',
