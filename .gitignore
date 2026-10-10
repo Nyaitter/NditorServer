@@ -9,6 +9,7 @@
 /server/nditor/data/
 /server/data/
 /.env
+/config.json
 /.env.*
 !/.env.example
 /.secrets

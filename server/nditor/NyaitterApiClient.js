@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('node:fs');
-const path = require('node:path');
 
 function makeError(message, statusCode = 502, code = null) {
   const error = new Error(message);
@@ -25,24 +23,7 @@ class NyaitterApiClient {
       this.extensionKey = configured;
       return configured;
     }
-    const configuredPath = String(
-      process.env.NDITOR_EXTENSION_API_KEY_FILE || 'data/secrets/nyaitter-extension-api-key',
-    ).trim();
-    if (!configuredPath) throw new Error('Nditor extension API key is not configured');
-    const projectRoot = path.resolve(__dirname, '../..');
-    const keyPath = path.isAbsolute(configuredPath)
-      ? configuredPath
-      : path.resolve(projectRoot, configuredPath);
-    let key;
-    try {
-      key = fs.readFileSync(keyPath, 'utf8').trim();
-    } catch (error) {
-      if (error.code === 'ENOENT') throw makeError('Nyaitter連携キーが未設定です。Serverのnscli extension-key createで発行し、NDITOR_EXTENSION_API_KEY_FILEに配置してください。', 503, 'extension_key_missing');
-      throw makeError('Nyaitter連携キーを読み取れません。キーの保存先とファイル権限を確認してください。', 503, 'extension_key_unreadable');
-    }
-    if (!key) throw new Error('Nditor extension API key is empty');
-    this.extensionKey = key;
-    return key;
+    throw makeError('Nyaitter拡張トークンが未設定です。nditor config token set <value>、.envのNDITOR_TOKEN、またはconfig.jsonのtokenを設定してください。', 503, 'extension_key_missing');
   }
 
   async request(route, {method = 'GET', accessToken = null, body = null, internal = false} = {}) {

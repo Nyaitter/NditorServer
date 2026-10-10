@@ -6,9 +6,9 @@
   "license": "GPL-3.0",
   "main": "server.js",
   "scripts": {
-    "start": "node bin/nditor.cjs serve",
-    "dev": "node bin/nditor.cjs serve --development",
-    "cli": "node bin/nditor.cjs",
+    "start": "bash bin/nditor serve",
+    "dev": "bash bin/nditor serve --development",
+    "cli": "bash bin/nditor",
     "build": "node scripts/build.mjs",
     "build:dev": "node scripts/build.mjs --development"
   },
@@ -155,8 +155,8 @@
   },
   "private": true,
   "bin": {
-    "nditor": "bin/nditor.cjs",
-    "nditorserver": "bin/nditor.cjs"
+    "nditor": "bin/nditor",
+    "nditorserver": "bin/nditor"
   },
   "repository": {
     "type": "git",

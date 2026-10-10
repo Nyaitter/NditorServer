@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT=${BASH_SOURCE[0]}
+while [[ -L "$SCRIPT" ]]; do
+  DIRECTORY=$(cd -P -- "$(dirname -- "$SCRIPT")" && pwd)
+  SCRIPT=$(readlink -- "$SCRIPT")
+  [[ "$SCRIPT" == /* ]] || SCRIPT="$DIRECTORY/$SCRIPT"
+done
+ROOT=$(cd -P -- "$(dirname -- "$SCRIPT")/.." && pwd)
+HELPER="$ROOT/scripts/cli-config.cjs"
+
+help() {
+  cat <<'EOF'
+NditorServer — Bash CLI
+  nditor install [--no-build]
+  nditor build [--development]
+  nditor config <url|nyaitter_url|token> set <value>
+  nditor config <url|nyaitter_url|token> get
+  nditor serve [--port PORT] [--host HOST] [--web-root DIR] [--development]
+  nditor status
+
+設定: リポジトリ直下の .env / config.json（環境変数を優先）
+トークンファイル・connect・config-dir引数は使用しません。
+EOF
+}
+
+run_npm() {
+  local cli
+  cli=$(node "$HELPER" npm-path)
+  if [[ -n "$cli" ]]; then node "$cli" "$@"; else npm "$@"; fi
+}
+
+command=${1:-help}
+[[ $# -eq 0 ]] || shift
+case "$command" in
+  help|--help|-h) help ;;
+  config)
+    [[ $# -ge 2 ]] || { help; exit 1; }
+    id=$1; action=$2; shift 2
+    case "$action" in
+      set) [[ $# -eq 1 ]] || { echo 'config set requires exactly one quoted value' >&2; exit 1; }
+        node "$HELPER" set "$id" "$1" ;;
+      get) [[ $# -eq 0 ]] || exit 1; node "$HELPER" get "$id" ;;
+      *) echo 'Use config <id> set <value> or config <id> get' >&2; exit 1 ;;
+    esac ;;
+  install)
+    [[ $# -eq 0 || ( $# -eq 1 && $1 == --no-build ) ]] || { help; exit 1; }
+    manifest=$(node "$HELPER" dependencies)
+    while IFS=$'\t' read -r repository revision branch relative; do
+      [[ -n "$repository" ]] || continue
+      target="$ROOT/$relative"
+      if [[ ! -e "$target" ]]; then git clone --depth 1 --branch "$branch" "$repository" "$target"; fi
+      [[ -e "$target/.git" ]] || { echo "Not a Git dependency: $relative" >&2; exit 1; }
+      [[ $(git -C "$target" remote get-url origin) == "$repository" ]] || { echo "Unexpected origin: $relative" >&2; exit 1; }
+      [[ -z $(git -C "$target" status --porcelain) ]] || { echo "Local changes in $relative; installation stopped" >&2; exit 1; }
+      if [[ $(git -C "$target" rev-parse HEAD) != "$revision" ]]; then
+        git -C "$target" fetch --depth 1 origin "$revision"
+        git -C "$target" checkout --detach "$revision"
+      fi
+      printf '%s: %s\n' "$relative" "$revision"
+    done <<< "$manifest"
+    cd "$ROOT"
+    run_npm ci --include=dev --ignore-scripts --no-audit --no-fund
+    [[ ${1:-} == --no-build ]] || node "$ROOT/scripts/build.mjs"
+    ;;
+  build)
+    [[ $# -eq 0 || ( $# -eq 1 && $1 == --development ) ]] || { help; exit 1; }
+    exec node "$ROOT/scripts/build.mjs" "$@" ;;
+  serve)
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --port|--host|--web-root)
+          [[ $# -ge 2 && $2 != --* ]] || { echo "$1 requires a value" >&2; exit 1; }
+          case "$1" in
+            --port) export NDITOR_PORT="$2" ;;
+            --host) export NDITOR_HOST="$2" ;;
+            --web-root) export NDITOR_WEB_ROOT="$2" ;;
+          esac
+          shift 2 ;;
+        --development) export NODE_ENV=development; shift ;;
+        *) echo "Unknown serve option: $1" >&2; exit 1 ;;
+      esac
+    done
+    export NODE_ENV=${NODE_ENV:-production}
+    node "$HELPER" ready
+    cd "$ROOT"
+    exec node "$ROOT/server.js" ;;
+  status) [[ $# -eq 0 ]] || exit 1; node "$HELPER" status ;;
+  *) echo "Unknown command: $command" >&2; help; exit 1 ;;
+esac

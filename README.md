@@ -1,80 +1,94 @@
 # NditorServer
 
-NditorのWebUI、クラウドScratch VM、共同作業APIとセットアップCLIです。
+NditorのWebUI、クラウドScratch VM、共同作業APIとBash CLIです。
 
 ## セットアップ
 
-Node.js 22以上、npm、Gitが必要です。現行の開発環境はNode.js 26です。
+Node.js 22以上、npm、Git、Bashが必要です。WindowsではGit Bashを使用してください。
 
-```sh
+```bash
 git clone https://github.com/Nyaitter/NditorServer.git
 cd NditorServer
-node bin/nditor.cjs install
+bash bin/nditor install
+# 任意: CLIをPATHへ登録
+npm link --ignore-scripts
 ```
 
-`install` は `vendor/sources.json` に記録されたNyaitterのForkを、固定コミットで取得します。その後npm依存をインストールし、WebUIをビルドします。依存のインストールフックは実行しません。既存の依存checkoutに未コミットの変更があれば停止します。
+installはNyaitterの依存Forkをvendor/sources.jsonの固定コミットで取得し、npm依存のインストールとWebUIのビルドを行います。既存checkoutに変更がある場合は停止します。取得のみならinstall --no-build、後からビルドする場合はbuildを使用します。
 
-依存の取得だけ行う場合は `node bin/nditor.cjs install --no-build`、後からビルドする場合は `node bin/nditor.cjs build` を使用します。
+## 設定
 
-CLIをPATHへ登録したい場合は、セットアップ後に `npm link --ignore-scripts` を実行してください。以降は `nditor` または `nditorserver` として呼び出せます。
-
-## NyaitterServerへ接続
-
-NyaitterServer側の `nscli` でNditor用の拡張トークンを発行してください。WebUIを配信する実際のオリジンを許可します。
-
-```sh
-nscli extension-key create --name Nditor --scope nyaitter-auth \
-  --redirect-origin http://localhost:3001 \
-  --redirect-origin http://127.0.0.1:3001 \
-  --output /private/nditor-extension-token
+```bash
+nditor config url set http://127.0.0.1:3001
+nditor config nyaitter_url set https://nyaitter.example
+nditor config token set 'YOUR_EXTENSION_TOKEN'
+nditor serve
 ```
 
-NditorServerで接続先とトークンを設定します。
+npm linkを使用しない場合はnditorをbash bin/nditorに置き換えてください。
 
-```sh
-nditor connect --server https://nyaitter.example \
-  --token-file /private/nditor-extension-token
+| ID | 内容 |
+| --- | --- |
+| url | WebUIの公開URL。明示的なポートがあれば配信ポートにも使用 |
+| nyaitter_url | NyaitterServerのURL |
+| token | NyaitterServerで発行した拡張トークン |
+
+config <id> set <value>はリポジトリ直下のconfig.jsonへ保存します。.envが存在する場合は同じ設定も更新します。config <id> getとstatusではtokenの値を表示しません。
+
+起動中のサーバーへの反映には再起動が必要です。
+
+Nyaitter式の設定優先順位は、プロセス環境変数 > .env > config.json > 既定値です。空の値は未設定として扱います。
+
+### config.json
+
+```json
+{
+  "url": "http://127.0.0.1:3001",
+  "nyaitter_url": "https://nyaitter.example",
+  "token": "YOUR_EXTENSION_TOKEN"
+}
 ```
 
-APIのルートは通常 `/server` です。異なる場合は `--api-path /prefix` を指定します。ローカルのNyaitterServerには `--server http://127.0.0.1:3000` を指定できます。リモートのHTTPは明示的に `--allow-http` を付けた場合のみ使用できます。
+### .env
 
-`connect` は設定を保存します。実際の認証とユーザートークンの取得はWebUIのNyaitterAuthログインで行います。拡張トークンはサーバーだけが使用し、ブラウザには配信しません。
+```ini
+NDITOR_URL=http://127.0.0.1:3001
+NDITOR_NYAITTER_URL=https://nyaitter.example
+NDITOR_TOKEN=YOUR_EXTENSION_TOKEN
+```
 
-設定とトークンはWindowsでは `%LOCALAPPDATA%/nditor-server`、Linux等では `$XDG_CONFIG_HOME/nditor-server` または `~/.config/nditor-server` に保存します。`--config-dir DIR` でリポジトリ外の保存先へ変更できます。トークンの値はCLIの出力に表示しません。
+.env.exampleとconfig.example.jsonを参考にしてください。実際の.envとconfig.jsonはGit管理対象外です。設定ファイルは可能なOSで権限600として保存します。
 
-## 指定ポートでWebUIを配信
+トークンはサーバーだけが使用し、WebUIへ配信しません。CLIの値引数はOSのプロセス一覧に一時的に現れることがあるため、必要なら設定ファイルを直接編集してください。
 
-```sh
-nditor serve --port 3001
-# LAN・リバースプロキシから受け付ける場合
+## 配信
+
+```bash
+nditor serve
 nditor serve --host 0.0.0.0 --port 8080
-```
-
-WebUIは `http://localhost:3001/editor/`、共同作業APIは同じポートで配信します。ポートや公開ホストを変更した場合は、NyaitterServerの拡張トークンで許可するオリジンも更新してください。
-
-WebUIだけなら接続設定なしでも配信できます。Nyaitterログインや連携機能には有効な接続設定が必要です。
-
-```sh
-nditor serve --web-root /absolute/path/to/built-ui --port 8080
-nditor serve --development --port 3001
+nditor serve --web-root /absolute/path/to/build
+nditor serve --development
 nditor status
 ```
 
-ローカルのプロジェクトストレージは設定領域の `storage/` に保存します。`NDITOR_STORAGE_ROOT` などの環境変数で変更できます。環境変数の例は `.env.example` を参照してください。
+WebUIは/editor/で配信します。Bashのserve引数で指定したhost、port、web-rootはその起動で設定を上書きします。公開ドメインをurlに指定した場合のlisten hostは既定127.0.0.1です。TLSはリバースプロキシで終端してください。HTTPS公開URLにポートを省略した場合、バックエンドの配信ポートは3001です。
+
+NyaitterServer側のnscliでnyaitter-authスコープの拡張キーを発行し、実際に使用するWebUIのオリジンを許可してください。ポート変更時も許可オリジンを更新します。ユーザーの認証はWebUIのNyaitterAuthログインで行います。
+
+APIパスを変更する場合はNDITOR_NYAITTER_API_PATHまたはconfig.jsonのnyaitter_api_pathを使用します。ローカルHTTPは使用できます。リモートHTTPはNDITOR_ALLOW_HTTP=trueまたはconfig.jsonのallow_http=trueが必要です。
+
+クラウド拡張はQuickJS（WASM）で隔離し、CPU・メモリ・通信を制限します。DOM/WebGL依存の制約についてはdocs/nditor-extensions.mdを参照してください。
 
 ## 依存Fork
 
-- [Nyaitter/scratch-vm](https://github.com/Nyaitter/scratch-vm)
-- [Nyaitter/scratch-paint](https://github.com/Nyaitter/scratch-paint)
-- [Nyaitter/scratch-render](https://github.com/Nyaitter/scratch-render)
-- [Nyaitter/paper.js](https://github.com/Nyaitter/paper.js)
+- https://github.com/Nyaitter/scratch-vm
+- https://github.com/Nyaitter/scratch-paint
+- https://github.com/Nyaitter/scratch-render
+- https://github.com/Nyaitter/paper.js
 
-クラウドのカスタム拡張はQuickJS（WASM）で隔離し、JSヒープ・CPU・通信を制限します。DOMやWebGLを直接使用する拡張には制約があります。
-
-既存依存には脆弱性監査での残存指摘があります。これは依存更新を完了したリリースではありません。
+既存依存には脆弱性監査での残存指摘があります。依存更新を完了したリリースではありません。
 
 ## ライセンスと由来
 
-GPL-3.0。NditorとTurboWarp/Scratch GUIを基にしたWebUIを含みます。
-上流の著作権表示・各依存のライセンスを維持しています。
+GPL-3.0。NditorとTurboWarp/Scratch GUIを基にしたWebUIを含みます。上流の著作権表示・各依存のライセンスを維持しています。
 GUI上流: https://github.com/TurboWarp/scratch-gui
