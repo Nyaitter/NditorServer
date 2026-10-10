@@ -68,7 +68,7 @@ function npmCommand(args) {
   if (script) return execute(process.execPath, [script, ...args]);
   if (process.platform === 'win32') {
     // Fixed arguments only; never interpolate paths or secrets into a shell.
-    if (args.some(arg => !/^[a-z-]+$/.test(arg))) throw new Error('Unsafe npm arguments');
+    if (args.some(arg => !/^[a-z=-]+$/.test(arg))) throw new Error('Unsafe npm arguments');
     return execute(process.env.ComSpec || 'cmd.exe', ['/d','/c','npm.cmd',...args]);
   }
   return execute('npm', args);
@@ -147,7 +147,7 @@ function install(options) {
   }
   // Upstream lifecycle hooks may build, download binaries or run tests. The
   // required application build is explicit and uses the pinned source forks.
-  npmCommand(['ci','--ignore-scripts','--no-audit','--no-fund']);
+  npmCommand(['ci','--include=dev','--ignore-scripts','--no-audit','--no-fund']);
   if (!options['no-build']) build(options);
 }
 
