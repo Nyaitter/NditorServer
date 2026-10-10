@@ -1,0 +1,154 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.modal {
+    width: 520px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    background: white;
+    color: #24292f;
+}
+
+.modal header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    border-bottom: 1px solid #d0d7de;
+    background: #eeeeee;
+    font-size: 14px;
+}
+
+.modal header button {
+    border: 0;
+    background: transparent;
+    color: #57606a;
+    font-size: 21px;
+    cursor: pointer;
+}
+
+.body {
+    max-height: calc(100vh - 100px);
+    overflow: auto;
+    padding: 14px;
+}
+
+.body form,
+.body label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.body form {
+    gap: 11px;
+    margin-top: 14px;
+}
+
+.body label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.body input,
+.body select {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid #d0d7de;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.body .checkbox {
+    flex-direction: row;
+    align-items: center;
+}
+
+.checkbox input {
+    width: auto;
+}
+
+.body p {
+    margin: 0;
+    color: #57606a;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.url-row {
+    display: flex;
+    gap: 7px;
+}
+
+.url-row input {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+}
+
+.url-row button {
+    flex: none;
+    min-width: 72px;
+}
+
+.copy-state {
+    color: #57606a;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.body button {
+    padding: 6px 10px;
+    border: 1px solid #0969da;
+    border-radius: 3px;
+    background: #0969da;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.requests {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #d8dee4;
+    font-size: 12px;
+}
+
+.requests > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 7px;
+    padding: 7px;
+    border: 1px solid #d8dee4;
+    border-radius: 3px;
+}
+
+.requests > div span:last-child {
+    display: flex;
+    gap: 5px;
+}
+
+.requests > div button:last-child {
+    border-color: #d0d7de;
+    background: #f6f8fa;
+    color: #24292f;
+}

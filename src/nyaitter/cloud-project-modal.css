@@ -1,0 +1,260 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #24292f;
+}
+
+.modal {
+    width: 640px;
+    max-width: calc(100vw - 32px);
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+    background: white;
+    border: 1px solid #d0d7de;
+    border-radius: 7px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    border-bottom: 1px solid #d0d7de;
+    background: #f6f8fa;
+    font-size: 15px;
+}
+
+.close {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #57606a;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    padding: 0 12px;
+    border-bottom: 1px solid #d8dee4;
+}
+
+.tabs button {
+    padding: 10px 12px 8px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: #57606a;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.tabs .active-tab {
+    border-bottom-color: #2f81f7;
+    color: #24292f;
+    font-weight: 600;
+}
+
+.body {
+    position: relative;
+    min-height: 180px;
+    max-height: calc(100vh - 145px);
+    overflow: auto;
+    padding: 14px;
+}
+
+.usage {
+    margin-bottom: 10px;
+    color: #57606a;
+    font-size: 12px;
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.project-row,
+.access-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px;
+    border: 1px solid #d8dee4;
+    border-radius: 5px;
+}
+
+.project-row > div:first-child {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.project-row strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.project-row span,
+.access-row small {
+    color: #57606a;
+    font-size: 11px;
+}
+
+.row-actions,
+.request-actions,
+.actions {
+    display: flex;
+    gap: 7px;
+}
+
+.body button {
+    padding: 6px 11px;
+    border: 1px solid #0969da;
+    border-radius: 5px;
+    background: #0969da;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.body button:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.body .secondary,
+.row-actions button:last-child,
+.access-row button:last-child {
+    border-color: #d0d7de;
+    background: #f6f8fa;
+    color: #24292f;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.form > label:not(.checkbox) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.form input,
+.form select,
+.inline-form input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 7px 9px;
+    border: 1px solid #d0d7de;
+    border-radius: 5px;
+    background: white;
+    color: #24292f;
+    font-size: 13px;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+}
+
+.checkbox input {
+    width: auto;
+}
+
+.help {
+    margin: -4px 0 0;
+    color: #57606a;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.actions {
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.access-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #d8dee4;
+}
+
+.access-section h3 {
+    margin: 10px 0 8px;
+    font-size: 13px;
+}
+
+.inline-form {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 8px;
+}
+
+.access-row {
+    margin-top: 6px;
+    padding: 7px 9px;
+    font-size: 12px;
+}
+
+.danger {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #d8dee4;
+}
+
+.danger button {
+    border-color: #cf222e;
+    background: white;
+    color: #cf222e;
+}
+
+.empty {
+    display: flex;
+    min-height: 130px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 7px;
+    color: #57606a;
+    font-size: 13px;
+    text-align: center;
+}
+
+.loading {
+    position: absolute;
+    right: 14px;
+    bottom: 10px;
+    padding: 5px 8px;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #57606a;
+    font-size: 11px;
+}

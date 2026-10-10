@@ -1,0 +1,27 @@
+{
+  "scratch-vm": {
+    "repository": "https://github.com/Nyaitter/scratch-vm.git",
+    "branch": "nditor",
+    "revision": "543b217f28de3df0a0715bd7eee8c820914caed6",
+    "path": "vendor/scratch-vm"
+  },
+  "scratch-paint": {
+    "repository": "https://github.com/Nyaitter/scratch-paint.git",
+    "branch": "nditor",
+    "revision": "4ff868ba049ba6ad02af3902442fbd93d849f9c5",
+    "path": "vendor/scratch-paint"
+  },
+  "scratch-render": {
+    "repository": "https://github.com/Nyaitter/scratch-render.git",
+    "branch": "nditor",
+    "revision": "e9d8eebb4546fe5392157fe336334518a06e8a53",
+    "path": "vendor/scratch-render"
+  },
+  "@turbowarp/paper": {
+    "repository": "https://github.com/Nyaitter/paper.js.git",
+    "branch": "nditor",
+    "revision": "2be6bb5d394f0474334748a3255670fa7cd05f66",
+    "path": "vendor/turbowarp-paper",
+    "artifact": "dist/paper-full.js"
+  }
+}

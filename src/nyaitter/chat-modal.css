@@ -1,0 +1,161 @@
+.chatWindow,
+.chat-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 360px;
+    height: 400px;
+    background: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-direction: column;
+    z-index: 5000;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+}
+
+.chatHeader,
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    background: #eeeeee;
+    border-bottom: 1px solid #d0d7de;
+    font-weight: 600;
+    color: #24292f;
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+}
+
+.chatWindowDragging,
+.chat-window-dragging {
+    user-select: none;
+}
+
+.chatWindowDragging .chatHeader,
+.chat-window-dragging .chat-header {
+    cursor: grabbing;
+}
+
+.closeButton,
+.close-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    line-height: 1;
+    color: #57609a;
+    cursor: pointer;
+    padding: 0 4px;
+    touch-action: manipulation;
+}
+
+.closeButton:hover,
+.close-button:hover {
+    color: #cf222e;
+}
+
+.messageList,
+.message-list {
+    flex: 1;
+    padding: 8px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: #ffffff;
+}
+
+.messageEmpty,
+.message-empty {
+    color: #57606a;
+    text-align: center;
+    margin-top: 40px;
+}
+
+.messageItem,
+.message-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 4px;
+    background: #ffffff;
+    border: 0;
+    border-bottom: 1px solid #eeeeee;
+    word-break: break-word;
+}
+
+.messageItemOwn,
+.message-item-own {
+    background: #f4f8fc;
+}
+
+.messageMeta,
+.message-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 11px;
+}
+
+.senderName,
+.sender-name {
+    font-weight: 600;
+    color: #24292f;
+}
+
+.messageTime,
+.message-time {
+    color: #6e7781;
+}
+
+.messageText,
+.message-text {
+    color: #1f2328;
+    white-space: pre-wrap;
+}
+
+.chatForm,
+.chat-form {
+    display: flex;
+    padding: 8px;
+    border-top: 1px solid #d0d7de;
+    background: #ffffff;
+    gap: 6px;
+}
+
+.chatInput,
+.chat-input {
+    flex: 1;
+    border: 1px solid #d0d7de;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.chatInput:focus,
+.chat-input:focus {
+    border-color: #0969da;
+}
+
+.sendButton,
+.send-button {
+    background: #0969da;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.sendButton:hover,
+.send-button:hover {
+    background: #0858b9;
+}
