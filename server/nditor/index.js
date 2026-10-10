@@ -96,7 +96,7 @@ function createNditorApi({nyaitterApiClient = new NyaitterApiClient()} = {}) {
     let membership = null;
     const leave = () => {
       if (!membership) return;
-      rooms.leave(membership.room.id, membership.participant.id);
+      rooms.leave(membership.room.id, membership.participant.id, socket);
       membership = null;
     };
     socket.on('message', (rawMessage, isBinary) => {

@@ -362,11 +362,14 @@ class CollaborationRoomManager {
     return { room, participant, replaced: Boolean(previous) };
   }
 
-  leave(roomId, participantId) {
+  leave(roomId, participantId, expectedSocket = null) {
     const room = this.getRoom(roomId);
     if (!room) return false;
     const participant = room.participants.get(String(participantId));
     if (!participant) return false;
+    // Replaced sockets close asynchronously after join() installs the new one.
+    // Their close handler must not remove the replacement participant.
+    if (expectedSocket && participant.socket !== expectedSocket) return false;
 
     const wasHost = participant.role === 'host' || room.currentHostParticipantId === String(participantId);
     room.participants.delete(String(participantId));
