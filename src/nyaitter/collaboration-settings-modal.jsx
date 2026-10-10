@@ -3,7 +3,7 @@ import React from 'react';
 import NyaitterIdBadge from './nyaitter-id-badge.jsx';
 import styles from './collaboration-settings-modal.css';
 
-const CollaborationSettingsModal = ({room, url, management, onClose, onSave, onDecision, onOpenCloudSettings}) => {
+const CollaborationSettingsModal = ({room, url, management, canChangePolicy, onClose, onSave, onDecision, onOpenCloudSettings}) => {
     const [accessMode, setAccessMode] = React.useState(room.access_mode || 'private');
     const [allowAnonymous, setAllowAnonymous] = React.useState(room.allow_anonymous !== false);
     const [invitedUsers, setInvitedUsers] = React.useState((management?.invited_user_ids || []).join(', '));
@@ -56,10 +56,12 @@ const CollaborationSettingsModal = ({room, url, management, onClose, onSave, onD
                 </React.Fragment> : <form
                     onSubmit={event => {
                         event.preventDefault();
+                        if (!canChangePolicy) return;
                         onSave({access_mode: accessMode, allow_anonymous: allowAnonymous, invited_users: invitedUsers});
                     }}
                 >
                     <label>権限<select
+                        disabled={!canChangePolicy}
                         value={accessMode}
                         onChange={event => setAccessMode(event.target.value)}
                     >
@@ -71,15 +73,17 @@ const CollaborationSettingsModal = ({room, url, management, onClose, onSave, onD
                         '招待URLを知っているユーザーが参加できます。'}</p>
                     <label className={styles.checkbox}><input
                         type="checkbox"
+                        disabled={!canChangePolicy}
                         checked={allowAnonymous}
                         onChange={event => setAllowAnonymous(event.target.checked)}
-                    />NyaitterIDにログインしていないユーザーも参加可能</label>
+                    />ゲストユーザーの参加を許可</label>
                     {accessMode === 'invite' && <label>招待するユーザー<input
+                        disabled={!canChangePolicy}
                         value={invitedUsers}
                         placeholder="NyaitterIDをカンマ区切りで入力"
                         onChange={event => setInvitedUsers(event.target.value)}
                     /></label>}
-                    <div className={styles.actions}><button type="submit">設定を保存</button></div>
+                    <div className={styles.actions}><button disabled={!canChangePolicy} type="submit">設定を保存</button></div>
                 </form>}
                 {!cloud && room.access_mode === 'invite' && <section className={styles.requests}>
                     <strong>参加申請</strong>

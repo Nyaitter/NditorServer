@@ -43,8 +43,8 @@ const CloudProjectModal = ({isOpen, onClose, vm, initialTab = 'list'}) => {
     const [storage, setStorage] = React.useState(null);
     const [busy, setBusy] = React.useState(false);
     const [name, setName] = React.useState('');
-    const [accessMode, setAccessMode] = React.useState('invite');
-    const [allowAnonymous, setAllowAnonymous] = React.useState(false);
+    const [accessMode, setAccessMode] = React.useState('private');
+    const [allowAnonymous, setAllowAnonymous] = React.useState(true);
     const [inviteIdentifier, setInviteIdentifier] = React.useState('');
     const [authenticated, setAuthenticated] = React.useState(Boolean(getAuthSession()?.user));
 
@@ -201,8 +201,8 @@ const CloudProjectModal = ({isOpen, onClose, vm, initialTab = 'list'}) => {
                     {authenticated && <button
                         type="button" className={tab === 'create' ? styles.activeTab : ''} onClick={() => {
                             setName('');
-                            setAccessMode('invite');
-                            setAllowAnonymous(false);
+                            setAccessMode('private');
+                            setAllowAnonymous(true);
                             setTab('create');
                         }}
                     >現在の作品を保存</button>}
@@ -242,7 +242,7 @@ const CloudProjectModal = ({isOpen, onClose, vm, initialTab = 'list'}) => {
                         <p className={styles.help}>{accessMode === 'invite' ?
                             '招待済みのユーザーと、参加申請を承認したユーザーだけが参加できます。' :
                             '共有URLを知っているユーザーが参加できます。'}</p>
-                        <label className={styles.checkbox}><input type="checkbox" checked={allowAnonymous} onChange={event => setAllowAnonymous(event.target.checked)} />NyaitterIDにログインしていないユーザーも参加可能</label>
+                        <label className={styles.checkbox}><input type="checkbox" checked={allowAnonymous} onChange={event => setAllowAnonymous(event.target.checked)} />ゲストユーザーの参加を許可</label>
                         <div className={styles.actions}><button disabled={busy} type="submit">クラウドに保存</button></div>
                     </form>}
 
@@ -256,7 +256,7 @@ const CloudProjectModal = ({isOpen, onClose, vm, initialTab = 'list'}) => {
                             <p className={styles.help}>{accessMode === 'invite' ?
                                 '招待済みのユーザーと、参加申請を承認したユーザーだけが参加できます。' :
                                 '共有URLを知っているユーザーが参加できます。'}</p>
-                            <label className={styles.checkbox}><input disabled={!project.is_owner} type="checkbox" checked={allowAnonymous} onChange={event => setAllowAnonymous(event.target.checked)} />NyaitterIDにログインしていないユーザーも参加可能</label>
+                            <label className={styles.checkbox}><input disabled={!project.is_owner} type="checkbox" checked={allowAnonymous} onChange={event => setAllowAnonymous(event.target.checked)} />ゲストユーザーの参加を許可</label>
                             {project.is_owner && <div className={styles.actions}>
                                 <button type="button" className={styles.secondary} onClick={copyShareUrl}>共有URLをコピー</button>
                                 <button disabled={busy} type="submit">設定を保存</button>

@@ -426,7 +426,7 @@ function ensureSoundHooksInstalled (audioEngine) {
 const CollaborationBridge = ({vm: propVm}) => {
     const [vm, setVm] = React.useState(propVm || window.vm || null);
     const [role, setRole] = React.useState(null);
-    const [status, setStatus] = React.useState('');
+    const [, setStatus] = React.useState('');
     const [modal, setModal] = React.useState(null);
     const [notices, setNotices] = React.useState([]);
     const noticeTimersRef = React.useRef(new Map());
@@ -2313,13 +2313,15 @@ const CollaborationBridge = ({vm: propVm}) => {
                     name: 'accessMode',
                     label: '権限',
                     type: 'select',
-                    value: 'invite',
+                    value: 'private',
+                    disabled: !getAuthSession()?.user,
                     options: [
-                        {value: 'invite', label: 'Invite — 招待または承認したユーザーのみ'},
+                        {value: 'private',
+                    disabled: !getAuthSession()?.user, label: 'Invite — 招待または承認したユーザーのみ'},
                         {value: 'private', label: 'Private — URLを知っているユーザー'}
                     ]
                 },
-                {name: 'allowAnonymous', label: '非ログインユーザーの参加を許可', type: 'checkbox', value: true, required: false},
+                {name: 'allowAnonymous', label: 'ゲストユーザーの参加を許可', type: 'checkbox', value: true, required: false, disabled: !getAuthSession()?.user},
                 {
                     name: 'invitedUsers',
                     label: '招待するNyaitterID（カンマ区切り）',
@@ -2363,6 +2365,7 @@ const CollaborationBridge = ({vm: propVm}) => {
             url={modal.url}
             management={modal.management}
             onClose={() => setModal(null)}
+            canChangePolicy={Boolean(getAuthSession()?.user)}
             onSave={saveCollaborationSettings}
             onDecision={decideAccessRequest}
             onOpenCloudSettings={() => {
@@ -2417,21 +2420,6 @@ const CollaborationBridge = ({vm: propVm}) => {
             />
             <button disabled={!inlineChatText.trim()} type="submit">送信</button>
         </form>}
-        {status && <aside
-            className={styles.collaborationBridge}
-        >
-            <span>{status}</span>
-            {!chatOpen && <button
-                className={styles.chatButton}
-                type="button"
-                onClick={() => {
-                    setChatOpen(true); setUnreadChatCount(0);
-                }}
-            >
-                チャット
-                {unreadChatCount > 0 && <span className={styles.chatUnread}>{unreadChatCount}</span>}
-            </button>}
-        </aside>}
         {renderedBlockInputPreviews.map(({participantId, preview, position}) => (
             <div
                 key={`block-input-preview-${participantId}`}

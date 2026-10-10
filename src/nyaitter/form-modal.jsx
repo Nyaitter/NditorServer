@@ -3,7 +3,7 @@ import React from 'react';
 import styles from './form-modal.css';
 
 const FormModal = ({title, fields, submitLabel, onCancel, onSubmit}) => {
-    const [values, setValues] = React.useState(() => Object.fromEntries(fields.map(field => [field.name, field.value || ''])));
+    const [values, setValues] = React.useState(() => Object.fromEntries(fields.map(field => [field.name, field.value ?? ''])));
     const handleSubmit = event => {
         event.preventDefault();
         onSubmit(values);
@@ -21,6 +21,7 @@ const FormModal = ({title, fields, submitLabel, onCancel, onSubmit}) => {
                             <label key={field.name} className={styles.checkboxField}>
                                 <input
                                     checked={Boolean(values[field.name])}
+                                    disabled={field.disabled}
                                     type="checkbox"
                                     onChange={event => setValues({...values, [field.name]: event.target.checked})}
                                 />
@@ -32,6 +33,7 @@ const FormModal = ({title, fields, submitLabel, onCancel, onSubmit}) => {
                                 {field.type === 'select' ? (
                                     <select
                                         autoFocus={field.autoFocus}
+                                        disabled={field.disabled}
                                         required={field.required !== false}
                                         value={values[field.name]}
                                         onChange={event => setValues({...values, [field.name]: event.target.value})}
@@ -41,6 +43,7 @@ const FormModal = ({title, fields, submitLabel, onCancel, onSubmit}) => {
                                 ) : (
                                     <input
                                         autoFocus={field.autoFocus}
+                                        disabled={field.disabled}
                                         maxLength={field.maxLength}
                                         readOnly={field.readOnly}
                                         required={field.required !== false}

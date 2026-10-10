@@ -294,7 +294,7 @@ class CloudProjectService {
     return key;
   }
 
-  async createProject(user, {name, accessMode = 'invite', allowAnonymous = false, snapshot}) {
+  async createProject(user, {name, accessMode = 'private', allowAnonymous = true, snapshot}) {
     const ownerId = userIdOf(user);
     if (!ownerId) throw projectError('ログインが必要です。', 401, 'AUTH_REQUIRED');
     const projects = await this.readProjects();

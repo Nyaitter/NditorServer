@@ -190,7 +190,7 @@ const saveCloudProject = async vm => {
     }
 };
 
-const createCloudProject = async (vm, {name, accessMode = 'invite', allowAnonymous = false} = {}) => {
+const createCloudProject = async (vm, {name, accessMode = 'private', allowAnonymous = true} = {}) => {
     if (!vm?.saveProjectSb3) throw new Error('プロジェクトを書き出せません。');
     const title = String(name || '').trim();
     if (!title) throw new Error('プロジェクト名を入力してください。');

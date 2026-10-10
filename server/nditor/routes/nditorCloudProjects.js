@@ -111,7 +111,7 @@ router.post({path: '/', summary: '現在の編集内容をクラウドに保存'
     const project = await service(req).createProject(req.user, {
       name: parsed.fields.name,
       accessMode: parsed.fields.access_mode,
-      allowAnonymous: boolValue(parsed.fields.allow_anonymous),
+      allowAnonymous: parsed.fields.allow_anonymous === undefined ? true : boolValue(parsed.fields.allow_anonymous),
       snapshot: parsed.file.buffer,
     });
     res.status(201).json({project});

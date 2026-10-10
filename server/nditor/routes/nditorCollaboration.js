@@ -52,8 +52,8 @@ async function roomAccess(req, room) {
 router.post({path: '/rooms', summary: 'ローカルプロジェクトの共同作業を開始', auth: 'optional'}, optionalAuth, async (req, res) => {
   try {
     const invitedUserIds = await resolveInvitedUsers(req, req.body?.invited_users || []);
-    if (!req.user && req.body?.allow_anonymous === false) {
-      return res.status(401).json({error: '非ログイン参加を無効にするにはNyaitterIDでログインしてください。', code: 'AUTH_REQUIRED'});
+    if (!req.user && (req.body?.allow_anonymous === false || (req.body?.access_mode && req.body.access_mode !== 'private'))) {
+      return res.status(401).json({error: '権限を既定値から変更するにはNyaitterIDでログインしてください。', code: 'AUTH_REQUIRED'});
     }
     res.status(201).json(req.app.locals.collaborationRooms.createRoom({
       hostId: req.user?.id || null,
@@ -164,6 +164,7 @@ router.patch({path: '/rooms/:token/settings', summary: 'ローカル共同作業
     const rooms = req.app.locals.collaborationRooms;
     const room = rooms.getRoomByToken(req.params.token);
     if (!room || room.storageType !== 'local') return res.status(404).json({error: 'ローカル共同作業ルームが見つかりません。'});
+    if (!req.user) return res.status(403).json({error: 'ゲストは権限を変更できません。', code: 'AUTH_REQUIRED'});
     rooms.localAccessManagement(room.token, req.user, accessCredentials(req).controlToken);
     const invitedUserIds = req.body?.invited_users === undefined
       ? room.invitedUserIds
