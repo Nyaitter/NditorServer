@@ -973,6 +973,7 @@ const CollaborationBridge = ({vm: propVm}) => {
 
     eventHandlerRef.current = event => {
         if (event.type === 'collaboration_joined') {
+            setChatMessages((event.chat_history || []).map(message => ({...message, from: message.senderId})));
             const nextRole = event.host ? 'host' : 'guest';
             roleRef.current = nextRole;
             setRole(nextRole);
@@ -1131,7 +1132,7 @@ const CollaborationBridge = ({vm: propVm}) => {
         }
         if (event.type === 'chat') {
             if (event.presence) updateRemotePresence({...event.presence, from: event.from});
-            setChatMessages(current => [...current, event]);
+            setChatMessages(current => current.some(message => message.id === event.id) ? current : [...current, event].slice(-100));
             if (!chatOpenRef.current) setUnreadChatCount(current => current + 1);
             const participantId = event.from;
             if (participantId) {
@@ -2143,7 +2144,8 @@ const CollaborationBridge = ({vm: propVm}) => {
             authDisplayName(user) || (roleRef.current === 'host' ? 'ホスト' : 'ゲスト'),
             chatPresence
         );
-        if (message) setChatMessages(current => [...current, {...message, isOwn: true}]);
+        if (message) setChatMessages(current => [...current, {...message, from: clientRef.current.participantId, isOwn: true}].slice(-100));
+        else showNotice('共同作業に接続してからチャットを送信してください。', 'error');
     };
     sendChatRef.current = sendChat;
 

@@ -362,6 +362,28 @@ class CollaborationRoomManager {
     return { room, participant, replaced: Boolean(previous) };
   }
 
+  addChat(room, message, participantId = null) {
+    const participant = participantId ? room.participants.get(participantId) : null;
+    const text = String(message.text || '').trim().slice(0, 1000);
+    if (!text || (!message.system && !participant)) return null;
+    if (!message.system) {
+      const now = Date.now();
+      const quota = participant.chatQuota || {tokens: 10, time: now};
+      quota.tokens = Math.min(10, quota.tokens + (now - quota.time) / 1000);
+      quota.time = now;
+      participant.chatQuota = quota;
+      if (quota.tokens < 1) return null;
+      quota.tokens -= 1;
+    }
+    const packet = {type: 'chat', id: String(message.id || crypto.randomUUID()).slice(0, 128),
+      timestamp: Date.now(), text, sender: message.system ? 'システム' : (participant?.name || 'ゲスト'),
+      senderId: message.system ? 'system' : participantId, system: Boolean(message.system),
+      presence: !message.system && message.presence && JSON.stringify(message.presence).length <= 8192 ? message.presence : null};
+    room.chatHistory = [...(room.chatHistory || []), packet].slice(-100);
+    this.broadcast(room.id, participantId, {type: 'collaboration_message', message: packet});
+    return packet;
+  }
+
   leave(roomId, participantId, expectedSocket = null) {
     const room = this.getRoom(roomId);
     if (!room) return false;
@@ -371,6 +393,7 @@ class CollaborationRoomManager {
     // Their close handler must not remove the replacement participant.
     if (expectedSocket && participant.socket !== expectedSocket) return false;
 
+    this.addChat(room, {system: true, text: `${participant.name}が退出しました。`}, participant.id);
     const wasHost = participant.role === 'host' || room.currentHostParticipantId === String(participantId);
     room.participants.delete(String(participantId));
 
@@ -503,6 +526,9 @@ class CollaborationRoomManager {
   broadcast(roomId, senderId, packet) {
     const room = this.getRoom(roomId);
     if (!room) return 0;
+    if (packet.type === 'collaboration_host_changed') {
+      this.addChat(room, {system: true, text: packet.new_host_name ? `${packet.new_host_name}がホストになりました。` : 'ホストの接続を待っています。'});
+    }
     const excludedId = senderId ? String(senderId) : null;
     const recipients = [];
     for (const participant of room.participants.values()) {

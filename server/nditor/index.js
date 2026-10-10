@@ -114,8 +114,10 @@ function createNditorApi({nyaitterApiClient = new NyaitterApiClient()} = {}) {
             accessReason: connection.principal?.accessReason || null,
             socket,
           });
+          rooms.addChat(membership.room, {system: true, text: `${membership.participant.name}が参加しました。`}, membership.participant.id);
           socket.send(JSON.stringify({
             type: 'collaboration_joined',
+            chat_history: membership.room.chatHistory || [],
             participant: {...membership.participant, socket: undefined},
             participants: rooms.participantList(membership.room),
             room: rooms.describe(membership.room.token),
@@ -128,6 +130,10 @@ function createNditorApi({nyaitterApiClient = new NyaitterApiClient()} = {}) {
         }
         if (!membership) return socket.close(4001, 'Join required');
         if (message?.type === 'collaboration_message' && message.message) {
+          if (message.message.type === 'chat') {
+            rooms.addChat(membership.room, {text: message.message.text, id: message.message.id, presence: message.message.presence}, membership.participant.id);
+            return;
+          }
           vmManager.handleClientMessage(membership.room.id, membership.participant.id, message.message, rawMessage.length);
         } else if (message?.type === 'collaboration_signal' && message.message) {
           rooms.signal(membership.room.id, membership.participant.id, message.message);

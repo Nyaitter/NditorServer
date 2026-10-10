@@ -614,7 +614,9 @@ class CollaborationClient {
             sender: String(senderName || this.guestName || 'ゲスト'),
             presence: presence && typeof presence === 'object' ? presence : null
         };
-        return this.broadcast(packet) ? packet : null;
+        if (!packet.text || !this.participantId || this.socket?.readyState !== WebSocket.OPEN) return null;
+        this.sendSocket({type: 'collaboration_message', message: {...packet, senderId: this.participantId}});
+        return packet;
     }
 
     sendChatTyping (typing) {
