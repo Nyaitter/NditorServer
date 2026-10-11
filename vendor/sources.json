@@ -2,7 +2,7 @@
   "scratch-vm": {
     "repository": "https://github.com/Nyaitter/scratch-vm.git",
     "branch": "nditor",
-    "revision": "543b217f28de3df0a0715bd7eee8c820914caed6",
+    "revision": "ae1c8668e1c8953e494167aec166239d8e951cb2",
     "path": "vendor/scratch-vm"
   },
   "scratch-paint": {

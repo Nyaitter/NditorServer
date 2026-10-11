@@ -2,7 +2,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import paper from '@turbowarp/paper';
-import captureVectorBase, {captureBitmapBase} from './capture-paint-base.js';
+import {captureBitmapBase} from './capture-paint-base.js';
 import {isCollaborationActive} from './collaboration-session-state.js';
 
 const OPERATION_INTERVAL_MS = 55;
@@ -414,9 +414,14 @@ class CollaborationPaintSurface extends React.Component {
         this.finishOperation('end', items, null, selectionItems, selectionItems);
     }
     captureEditBase () {
+        if (this.editBase) return;
         const props = this.gestureEditorProps || this.props;
         const assetId = String(props.imageId || '').slice(String(this.props.collaborationTargetId || '').length + 1);
-        const base = this.props.imageFormat === 'svg' ? captureVectorBase() : captureBitmapBase() || {
+        const base = props.imageFormat === 'svg' ? {
+            svg: props.image,
+            rotationCenterX: props.rotationCenterX,
+            rotationCenterY: props.rotationCenterY
+        } : captureBitmapBase() || {
             data: String(props.image || '').split(',')[1],
             dataFormat: this.props.imageFormat,
             rotationCenterX: props.rotationCenterX,
@@ -427,13 +432,6 @@ class CollaborationPaintSurface extends React.Component {
     handleUpdateImage (...args) {
         const base = this.collaborationActive ? this.editBase : null;
         this.emitCommittedPaperChange();
-        if (args[0] && typeof args[1] === 'string') {
-            const dom = new DOMParser().parseFromString(args[1], 'image/svg+xml');
-            const box = dom.documentElement.getAttribute('viewBox')?.trim()
-                .split(/[\s,]+/)
-                .map(Number);
-            if (box?.length === 4) { args[2] -= box[0]; args[3] -= box[1]; }
-        }
         const result = this.props.onUpdateImage(...args, base);
         this.editBase = null;
         return result;
